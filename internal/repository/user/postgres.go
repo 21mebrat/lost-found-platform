@@ -37,16 +37,11 @@ func (p *PostgresRepository) Create(
 			phone_verified,
 			email_verified,
 			profile_image_url,
-			status,
-			role,
 			last_login_at,
-			created_at,
-			updated_at
 		)
 		VALUES (
 			$1, $2, $3, $4, $5,
-			$6, $7, $8, $9, $10,
-			$11, $12, $13
+			$6, $7, $8, $9
 		)
 		RETURNING
 			id,
@@ -78,8 +73,6 @@ func (p *PostgresRepository) Create(
 		user.PhoneVerified,
 		user.EmailVerified,
 		user.ProfileImageURL,
-		user.Status,
-		user.Role,
 		user.LastLoginAt,
 		user.CreatedAt,
 		user.UpdatedAt,
@@ -327,9 +320,8 @@ func (p *PostgresRepository) scanUser(
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, domain.ErrUserNotFound
+		return nil, nil
 	}
-
 	if err != nil {
 		return nil, err
 	}

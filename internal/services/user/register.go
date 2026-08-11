@@ -3,16 +3,11 @@ package user
 import (
 	"context"
 	"net/mail"
-	"regexp"
 	"strings"
 
 	"github.com/21mebrat/lost-found-platform/internal/auth"
 	"github.com/21mebrat/lost-found-platform/internal/domain/user"
 	"github.com/21mebrat/lost-found-platform/internal/validator"
-)
-
-var passwordRegex = regexp.MustCompile(
-	`^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$`,
 )
 
 func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserResponse, error) {
@@ -32,7 +27,10 @@ func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserRes
 	if err != nil {
 		return nil, ErrorInvalidEmail
 	}
-
+	_, edup := s.GetByEmail(ctx, input.Email)
+	if edup != nil {
+		return nil, ErrorEmailAlreadyExists
+	}
 	if strings.TrimSpace(input.Phone) == "" {
 		return nil, ErrorPhoneRequired
 	}
@@ -41,12 +39,16 @@ func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserRes
 	if err != nil {
 		return nil, err
 	}
+	_, dup := s.GetByPhone(ctx, phone)
 
+	if dup != nil {
+		return nil, ErrorPhoneAlreadyExists
+	}
 	if strings.TrimSpace(input.Password) == "" {
 		return nil, ErrorPasswordRequired
 	}
 
-	if !passwordRegex.MatchString(input.Password) {
+	if !validator.ValidatePassword(input.Password) {
 		return nil, ErrorInvalidPassword
 	}
 

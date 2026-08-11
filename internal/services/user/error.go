@@ -12,5 +12,8 @@ var (
 	ErrorInvalidPassword   = errors.New(
 		"password must be at least 8 characters and contain uppercase, lowercase, digit, and special character",
 	)
-	ErrorUserNotFound = errors.New("user is not found.")
+	ErrorPhoneAlreadyExists = errors.New("The Phone Already exists.")
+	ErrorEmailAlreadyExists = errors.New("The Email already exists.")
+	ErrorUserNotFound       = errors.New("user is not found.")
+	ErrorInvalidIput        = "invalid request body"
 )

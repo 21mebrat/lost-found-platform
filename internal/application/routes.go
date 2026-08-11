@@ -1,10 +1,12 @@
 package application
 
 import (
-	"encoding/json"
-	"net/http"
 	"time"
 
+	userhandler "github.com/21mebrat/lost-found-platform/internal/handlers/user"
+	userrepo "github.com/21mebrat/lost-found-platform/internal/repository/user"
+	"github.com/21mebrat/lost-found-platform/internal/routes"
+	userservice "github.com/21mebrat/lost-found-platform/internal/services/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -18,22 +20,13 @@ func (a *App) LoadRoutes() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Timeout(5 * time.Second))
 
-	// define your routes here
-	//sample
-	router.Get("/health", a.healthHandler)
+	// initate user rep
+	userRepository := userrepo.NewPostgresRepository(a.DB)
+	UserService := userservice.NewService(userRepository)
+	userHandler := userhandler.NewHandler(UserService)
+
+	// user routes
+	routes.UserRoutes(router, userHandler)
 
 	a.Router = router
-}
-
-func (app *App) healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	resp := map[string]string{
-		"status":  "ok",
-		"service": app.Config.AppName,
-		"env":     app.Config.Environment,
-		"version": app.Version,
-	}
-
-	_ = json.NewEncoder(w).Encode(resp)
 }

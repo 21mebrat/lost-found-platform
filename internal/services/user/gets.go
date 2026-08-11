@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -33,6 +34,7 @@ func (s *Service) GetByEmail(ctx context.Context, email string) (*UserResponse, 
 	}
 
 	u, err := s.repo.GetByEmail(ctx, email)
+	fmt.Print("user", err)
 	if err != nil {
 		return nil, err
 	}
