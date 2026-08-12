@@ -29,5 +29,5 @@ type UserResponse struct {
 	Role            string `json:"role"`
 	Status          string `json:"status"`
 	CreatedAt       string `json:"created_at"`
-	LastLoginAt     string `json:"LastLoginAt"`
+	LastLoginAt     string `json:"last_login_at"`
 }

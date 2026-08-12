@@ -37,7 +37,7 @@ func (p *PostgresRepository) Create(
 			phone_verified,
 			email_verified,
 			profile_image_url,
-			last_login_at,
+			last_login_at
 		)
 		VALUES (
 			$1, $2, $3, $4, $5,
@@ -74,8 +74,6 @@ func (p *PostgresRepository) Create(
 		user.EmailVerified,
 		user.ProfileImageURL,
 		user.LastLoginAt,
-		user.CreatedAt,
-		user.UpdatedAt,
 	).Scan(
 		&createdUser.ID,
 		&createdUser.FirstName,

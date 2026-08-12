@@ -2,8 +2,10 @@ package user
 
 import (
 	"context"
+	"errors"
 	"net/mail"
 	"strings"
+	"time"
 
 	"github.com/21mebrat/lost-found-platform/internal/auth"
 	"github.com/21mebrat/lost-found-platform/internal/domain/user"
@@ -27,10 +29,16 @@ func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserRes
 	if err != nil {
 		return nil, ErrorInvalidEmail
 	}
-	_, edup := s.GetByEmail(ctx, input.Email)
-	if edup != nil {
+	existingUser, err := s.GetByEmail(ctx, input.Email)
+
+	if err == nil && existingUser != nil {
 		return nil, ErrorEmailAlreadyExists
 	}
+
+	if err != nil && !errors.Is(err, ErrorUserNotFound) {
+		return nil, err
+	}
+
 	if strings.TrimSpace(input.Phone) == "" {
 		return nil, ErrorPhoneRequired
 	}
@@ -39,11 +47,16 @@ func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserRes
 	if err != nil {
 		return nil, err
 	}
-	_, dup := s.GetByPhone(ctx, phone)
+	existingUser, err = s.GetByPhone(ctx, phone)
 
-	if dup != nil {
+	if err == nil && existingUser != nil {
 		return nil, ErrorPhoneAlreadyExists
 	}
+
+	if err != nil && !errors.Is(err, ErrorUserNotFound) {
+		return nil, err
+	}
+
 	if strings.TrimSpace(input.Password) == "" {
 		return nil, ErrorPasswordRequired
 	}
@@ -80,6 +93,7 @@ func (s *Service) Register(ctx context.Context, input RegisterRequest) (*UserRes
 		PhoneVerified:   createdUser.PhoneVerified,
 		ProfileImageURL: createdUser.ProfileImageURL,
 		Role:            string(createdUser.Role),
+		CreatedAt:       createdUser.CreatedAt.Format(time.RFC3339),
 		Status:          string(createdUser.Status),
 	}, nil
 }

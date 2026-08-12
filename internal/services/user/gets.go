@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -11,40 +10,45 @@ import (
 )
 
 func (s *Service) GetByID(ctx context.Context, id string) (*UserResponse, error) {
-
-	userId, err := uuid.Parse(id)
-
+	userID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	u, err := s.repo.GetByID(ctx, userId)
+	u, err := s.repo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, err
+	}
+
+	if u == nil {
+		return nil, ErrorUserNotFound
 	}
 
 	return toUserResponse(u), nil
 }
 
 func (s *Service) GetByEmail(ctx context.Context, email string) (*UserResponse, error) {
-
 	email = strings.ToLower(strings.TrimSpace(email))
+
 	if email == "" {
 		return nil, ErrorEmailRequired
 	}
 
 	u, err := s.repo.GetByEmail(ctx, email)
-	fmt.Print("user", err)
 	if err != nil {
 		return nil, err
+	}
+
+	if u == nil {
+		return nil, ErrorUserNotFound
 	}
 
 	return toUserResponse(u), nil
 }
 
 func (s *Service) GetByPhone(ctx context.Context, phone string) (*UserResponse, error) {
-
 	phone = strings.TrimSpace(phone)
+
 	if phone == "" {
 		return nil, ErrorPhoneRequired
 	}
@@ -54,26 +58,31 @@ func (s *Service) GetByPhone(ctx context.Context, phone string) (*UserResponse, 
 		return nil, err
 	}
 
+	if u == nil {
+		return nil, ErrorUserNotFound
+	}
+
 	return toUserResponse(u), nil
 }
 
-func toUserResponse(u *domain.User) *UserResponse {
-	if u == nil {
-		return nil
+func toUserResponse(user *domain.User) *UserResponse {
+	response := &UserResponse{
+		ID:              user.ID.String(),
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		Phone:           user.Phone,
+		EmailVerified:   user.EmailVerified,
+		PhoneVerified:   user.PhoneVerified,
+		Role:            string(user.Role),
+		Status:          string(user.Status),
+		ProfileImageURL: user.ProfileImageURL,
+		CreatedAt:       user.CreatedAt.Format(time.RFC3339),
 	}
 
-	return &UserResponse{
-		ID:              u.ID.String(),
-		FirstName:       u.FirstName,
-		LastName:        u.LastName,
-		Email:           u.Email,
-		EmailVerified:   u.EmailVerified,
-		Phone:           u.Phone,
-		PhoneVerified:   u.PhoneVerified,
-		ProfileImageURL: u.ProfileImageURL,
-		Role:            string(u.Role),
-		Status:          string(u.Status),
-		LastLoginAt:     u.LastLoginAt.Format(time.RFC3339),
-		CreatedAt:       u.CreatedAt.Format(time.RFC3339),
+	if user.LastLoginAt != nil {
+		response.LastLoginAt = user.LastLoginAt.Format(time.RFC3339)
 	}
+
+	return response
 }
