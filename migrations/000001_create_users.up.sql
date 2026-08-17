@@ -1,37 +1,44 @@
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE TYPE user_status AS ENUM (
+    'active',
+    'banned',
+    'suspended'
+);
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
+    first_name TEXT NOT NULL,
+    middle_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
 
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
+    phone TEXT NOT NULL UNIQUE,
+    email TEXT UNIQUE,
+
+    fayda TEXT UNIQUE,
+
+    language_code VARCHAR(3) NOT NULL DEFAULT 'en',
+
     password_hash TEXT NOT NULL,
 
-    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_fayda_verified BOOLEAN NOT NULL DEFAULT FALSE
 
-    profile_image_url TEXT,
+    status user_status NOT NULL DEFAULT 'active',
 
-    role VARCHAR(20) NOT NULL DEFAULT 'USER',
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-
-    last_login_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT users_role_check
-        CHECK (role IN ('USER', 'MODERATOR', 'ADMIN')),
-
-    CONSTRAINT users_status_check
-        CHECK (status IN ('ACTIVE', 'SUSPENDED', 'BLOCKED')),
-
-    CONSTRAINT users_email_unique
-        UNIQUE (email),
-
-    CONSTRAINT users_phone_unique
-        UNIQUE (phone)
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX idx_users_phone_active ON users(phone) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX idx_users_email_active ON users(email) WHERE deleted_at IS NULL AND email IS NOT NULL;
+CREATE UNIQUE INDEX idx_users_fayda_active ON users(fayda) WHERE deleted_at IS NULL AND fayda_hash IS NOT NULL;
+ 
+CREATE INDEX idx_users_status ON users(status);
+ 
+CREATE TRIGGER trg_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION set_updated_at();
+ 
