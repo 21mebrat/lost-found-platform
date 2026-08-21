@@ -1,15 +1,30 @@
 package user
 
-import "github.com/21mebrat/lost-found-platform/internal/repository/user"
+import (
+	otprepo "github.com/21mebrat/lost-found-platform/internal/repository/otp"
+	userrepo "github.com/21mebrat/lost-found-platform/internal/repository/user"
+	smsservice "github.com/21mebrat/lost-found-platform/internal/services/sms"
+)
 
+// Service provides application business logic for User entity operations and OTP phone verification.
 type Service struct {
-	repo user.Repository
+	repo       userrepo.Repository
+	otpRepo    otprepo.Repository
+	smsService smsservice.SMSService
 }
 
+// Compile-time interface assertion
 var _ UserService = (*Service)(nil)
 
-func NewService(rep user.Repository) *Service {
+// NewService constructs a new User service instance with required dependencies.
+func NewService(
+	repo userrepo.Repository,
+	otpRepo otprepo.Repository,
+	smsService smsservice.SMSService,
+) *Service {
 	return &Service{
-		repo: rep,
+		repo:       repo,
+		otpRepo:    otpRepo,
+		smsService: smsService,
 	}
 }

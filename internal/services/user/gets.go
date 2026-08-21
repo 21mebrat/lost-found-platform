@@ -6,13 +6,14 @@ import (
 	"time"
 
 	domain "github.com/21mebrat/lost-found-platform/internal/domain/user"
+	userrepo "github.com/21mebrat/lost-found-platform/internal/repository/user"
 	"github.com/google/uuid"
 )
 
 func (s *Service) GetByID(ctx context.Context, id string) (*UserResponse, error) {
-	userID, err := uuid.Parse(id)
+	userID, err := uuid.Parse(strings.TrimSpace(id))
 	if err != nil {
-		return nil, err
+		return nil, ErrorInvalidID
 	}
 
 	u, err := s.repo.GetByID(ctx, userID)
@@ -24,17 +25,17 @@ func (s *Service) GetByID(ctx context.Context, id string) (*UserResponse, error)
 		return nil, ErrorUserNotFound
 	}
 
-	return toUserResponse(u), nil
+	return ToUserResponse(u), nil
 }
 
 func (s *Service) GetByEmail(ctx context.Context, email string) (*UserResponse, error) {
-	email = strings.ToLower(strings.TrimSpace(email))
+	cleanEmail := strings.ToLower(strings.TrimSpace(email))
 
-	if email == "" {
+	if cleanEmail == "" {
 		return nil, ErrorEmailRequired
 	}
 
-	u, err := s.repo.GetByEmail(ctx, email)
+	u, err := s.repo.GetByEmail(ctx, cleanEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +44,17 @@ func (s *Service) GetByEmail(ctx context.Context, email string) (*UserResponse, 
 		return nil, ErrorUserNotFound
 	}
 
-	return toUserResponse(u), nil
+	return ToUserResponse(u), nil
 }
 
 func (s *Service) GetByPhone(ctx context.Context, phone string) (*UserResponse, error) {
-	phone = strings.TrimSpace(phone)
+	cleanPhone := strings.TrimSpace(phone)
 
-	if phone == "" {
+	if cleanPhone == "" {
 		return nil, ErrorPhoneRequired
 	}
 
-	u, err := s.repo.GetByPhone(ctx, phone)
+	u, err := s.repo.GetByPhone(ctx, cleanPhone)
 	if err != nil {
 		return nil, err
 	}
@@ -62,27 +63,56 @@ func (s *Service) GetByPhone(ctx context.Context, phone string) (*UserResponse, 
 		return nil, ErrorUserNotFound
 	}
 
-	return toUserResponse(u), nil
+	return ToUserResponse(u), nil
 }
 
-func toUserResponse(user *domain.User) *UserResponse {
-	response := &UserResponse{
-		ID:              user.ID.String(),
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		Email:           user.Email,
-		Phone:           user.Phone,
-		EmailVerified:   user.EmailVerified,
-		PhoneVerified:   user.PhoneVerified,
-		Role:            string(user.Role),
-		Status:          string(user.Status),
-		ProfileImageURL: user.ProfileImageURL,
-		CreatedAt:       user.CreatedAt.Format(time.RFC3339),
+func (s *Service) GetByFayda(ctx context.Context, fayda string) (*UserResponse, error) {
+	cleanFayda := strings.TrimSpace(fayda)
+
+	if cleanFayda == "" {
+		return nil, ErrorUserNotFound
 	}
 
-	if user.LastLoginAt != nil {
-		response.LastLoginAt = user.LastLoginAt.Format(time.RFC3339)
+	u, err := s.repo.GetByFayda(ctx, cleanFayda)
+	if err != nil {
+		return nil, err
 	}
 
-	return response
+	if u == nil {
+		return nil, ErrorUserNotFound
+	}
+
+	return ToUserResponse(u), nil
+}
+
+func (s *Service) GetList(ctx context.Context, params userrepo.ListParams) (*UserListResponse, error) {
+	paginated, err := s.repo.GetList(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return ToUserListResponse(paginated), nil
+}
+
+func ToUserResponse(u *domain.User) *UserResponse {
+	if u == nil {
+		return nil
+	}
+
+	return &UserResponse{
+		ID:              u.ID.String(),
+		FirstName:       u.FirstName,
+		MiddleName:      u.MiddleName,
+		LastName:        u.LastName,
+		Phone:           u.Phone,
+		Email:           u.Email,
+		Fayda:           u.Fayda,
+		LanguageCode:    u.LanguageCode,
+		PhoneVerified:   u.PhoneVerified,
+		FaydaVerified:   u.FaydaVerified,
+		ProfileImageURL: u.ProfileImageURL,
+		Status:          string(u.Status),
+		CreatedAt:       u.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:       u.UpdatedAt.Format(time.RFC3339),
+	}
 }

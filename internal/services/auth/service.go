@@ -54,7 +54,7 @@ func (s *Service) Login(ctx context.Context, input LoginInput) (*LoginResponse, 
 		return nil, err
 	}
 	// access token
-	accessToken, expiresAt, err := s.JWT.GenerateAccessToken(user.ID, user.Email, string(user.Role))
+	accessToken, expiresAt, err := s.JWT.GenerateAccessToken(user.ID, *user.Email, string(user.Role))
 
 	if err != nil {
 		return nil, err

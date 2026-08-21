@@ -8,38 +8,44 @@ import (
 )
 
 type Config struct {
-	AppName            string
-	Environment        string
-	ServerPort         uint16
-	DBHost             string
-	DBPort             uint16
-	DBUser             string
-	DBPassword         string
-	DBName             string
-	DatabaseURL        string
-	DBSSLMode          string
-	RedisAddr          string
-	RedisPassword      string
-	JWTSecret          string
-	JWTIssuer          string
-	JWTAccessDuration  time.Duration
-	JWTRefreshDuration time.Duration
+	AppName             string
+	Environment         string
+	ServerPort          uint16
+	DBHost              string
+	DBPort              uint16
+	DBUser              string
+	DBPassword          string
+	DBName              string
+	DatabaseURL         string
+	DBSSLMode           string
+	RedisAddr           string
+	RedisPassword       string
+	JWTSecret           string
+	JWTIssuer           string
+	JWTAccessDuration   time.Duration
+	JWTRefreshDuration  time.Duration
+	AfroMessageToken    string
+	AfroMessageSenderID string
+	AfroMessageURL      string
 }
 
 func Load() (*Config, error) {
 
 	cfg := &Config{
-		AppName:       getEnv("APP_NAME", "user-service"),
-		Environment:   getEnv("APP_ENV", "development"),
-		DBHost:        getEnv("DB_HOST", "localhost"),
-		DBUser:        getEnv("DB_USER", "postgres"),
-		DBPassword:    getEnv("DB_PASSWORD", "postgres"),
-		DBName:        getEnv("DB_NAME", "user_service"),
-		DBSSLMode:     getEnv("DB_SSLMODE", "disable"),
-		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
-		RedisPassword: getEnv("REDIS_PASSWORD", ""),
-		JWTSecret:     getEnv("JWT_SECRET", "change-me"),
-		JWTIssuer:     getEnv("JWT_ISSUER", "user-service"),
+		AppName:             getEnv("APP_NAME", "user-service"),
+		Environment:         getEnv("APP_ENV", "development"),
+		DBHost:              getEnv("DB_HOST", "localhost"),
+		DBUser:              getEnv("DB_USER", "postgres"),
+		DBPassword:          getEnv("DB_PASSWORD", "postgres"),
+		DBName:              getEnv("DB_NAME", "user_service"),
+		DBSSLMode:           getEnv("DB_SSLMODE", "disable"),
+		RedisAddr:           getEnv("REDIS_ADDR", "localhost:6379"),
+		RedisPassword:       getEnv("REDIS_PASSWORD", ""),
+		JWTSecret:           getEnv("JWT_SECRET", "change-me"),
+		JWTIssuer:           getEnv("JWT_ISSUER", "user-service"),
+		AfroMessageToken:    getEnv("AFROMESSAGE_TOKEN", ""),
+		AfroMessageSenderID: getEnv("AFROMESSAGE_SENDER_ID", ""),
+		AfroMessageURL:      getEnv("AFROMESSAGE_URL", ""),
 	}
 
 	sport := getEnv("SERVER_PORT", "8080")

@@ -10,6 +10,8 @@ func UserRoutes(
 	handler *userhandler.Handler,
 ) {
 	r.Route("/api/v1/users", func(r chi.Router) {
-		r.Post("/register", handler.Register)
+		r.Post("/otp/send", handler.SendOTP)
+		r.Post("/otp/verify", handler.VerifyOTP)
+		r.Post("/profile/complete", handler.CompleteProfile)
 	})
 }

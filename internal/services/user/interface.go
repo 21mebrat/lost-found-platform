@@ -1,11 +1,25 @@
 package user
 
-import "context"
+import (
+	"context"
+
+	userrepo "github.com/21mebrat/lost-found-platform/internal/repository/user"
+)
 
 type UserService interface {
-	Register(
+	SendOTP(
 		ctx context.Context,
-		req RegisterRequest,
+		req SendOTPRequest,
+	) (*SendOTPResponse, error)
+
+	VerifyOTP(
+		ctx context.Context,
+		req VerifyOTPRequest,
+	) (*VerifyOTPResponse, error)
+
+	CompleteProfile(
+		ctx context.Context,
+		req CompleteProfileRequest,
 	) (*UserResponse, error)
 
 	GetByID(
@@ -23,14 +37,24 @@ type UserService interface {
 		phone string,
 	) (*UserResponse, error)
 
+	GetByFayda(
+		ctx context.Context,
+		fayda string,
+	) (*UserResponse, error)
+
+	GetList(
+		ctx context.Context,
+		params userrepo.ListParams,
+	) (*UserListResponse, error)
+
 	Update(
 		ctx context.Context,
 		id string,
 		req UpdateRequest,
 	) (*UserResponse, error)
 
-	// Delete(
-	// 	ctx context.Context,
-	// 	id string,
-	// ) error
+	Delete(
+		ctx context.Context,
+		id string,
+	) error
 }

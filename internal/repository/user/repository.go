@@ -23,6 +23,11 @@ type Repository interface {
 		email string,
 	) (*domain.User, error)
 
+	GetByFayda(
+		ctx context.Context,
+		fayda string,
+	) (*domain.User, error)
+
 	GetByPhone(
 		ctx context.Context,
 		phone string,
@@ -33,14 +38,13 @@ type Repository interface {
 		user *domain.User,
 	) (*domain.User, error)
 
+	GetList(
+		ctx context.Context,
+		params ListParams,
+	) (*PaginatedUsers, error)
+
 	Delete(
 		ctx context.Context,
 		id uuid.UUID,
 	) error
-
-	scanUser(
-		ctx context.Context,
-		query string,
-		arg any,
-	) (*domain.User, error)
 }

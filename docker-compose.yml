@@ -1,14 +1,17 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgis/postgis:17-3.5
     container_name: lf-postgres
     restart: unless-stopped
+
     environment:
       POSTGRES_DB: lost_found
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
     ports:
       - "5433:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -16,8 +19,10 @@ services:
     image: redis:8
     container_name: lf-redis
     restart: unless-stopped
+
     ports:
       - "6379:6379"
+
     volumes:
       - redis_data:/data
 

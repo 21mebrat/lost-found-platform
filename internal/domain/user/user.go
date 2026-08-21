@@ -9,46 +9,39 @@ import (
 type Status string
 
 const (
-	StatusActive    Status = "ACTIVE"
-	StatusSuspended Status = "SUSPENDED"
-	StatusBlocked   Status = "BLOCKED"
+	StatusActive    Status = "active"
+	StatusBanned    Status = "banned"
+	StatusSuspended Status = "suspended"
 )
 
 type Role string
 
 const (
-	RoleUser      Role = "USER"
-	RoleModerator Role = "MODERATOR"
-	RoleAdmin     Role = "ADMIN"
+	RoleUser  Role = "user"
+	RoleAdmin Role = "admin"
 )
 
 type User struct {
-	ID uuid.UUID
+	ID           uuid.UUID `json:"id"`
+	FirstName    string    `json:"first_name"`
+	MiddleName   string    `json:"middle_name"`
+	LastName     string    `json:"last_name"`
+	Phone        string    `json:"phone"`
+	Email        *string   `json:"email"`
+	PasswordHash string    `json:"password_hash"`
 
-	// Identity
-	FirstName string
-	LastName  string
+	Fayda *string `json:"fayda"`
 
-	// Authentication
-	Email        string
-	Phone        string
-	PasswordHash string
+	LanguageCode string `json:"language_code"`
 
-	// Verification
-	EmailVerified bool
-	PhoneVerified bool
+	PhoneVerified bool `json:"phone_verified"`
+	FaydaVerified bool `json:"fayda_verified"`
 
-	// Profile
-	ProfileImageURL string
+	ProfileImageURL *string `json:"profile_image_url"`
 
-	// Authorization
-	Role   Role
-	Status Status
-
-	// Authentication Activity
-	LastLoginAt *time.Time
-
-	// Audit
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Status    Status     `json:"status"`
+	Role      Role       `json:"role"`
+	DeletedAt *time.Time `json:"deleted_at"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 }
